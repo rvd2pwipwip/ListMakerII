@@ -11,8 +11,13 @@ class TodoListAdapter: RecyclerView.Adapter<TodoListViewHolder>() {
     private var todoLists = mutableListOf("Android Development", "House Work", "Errands", "Shopping")
 
     //create a function that will add an item to the list and notify the recycler view about it
-    fun addNewItem() {
-        todoLists.add("Todo List ${todoLists.size + 1}")
+    fun addNewItem(listName: String = "") {
+        // check to see if listName is empty to add a default todo or add the user entered todo name
+        if (listName.isEmpty()) {
+            todoLists.add("Todo List ${todoLists.size + 1}")
+        } else {
+            todoLists.add(listName)
+        }
         notifyDataSetChanged()
     }
 
