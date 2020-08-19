@@ -1,10 +1,14 @@
 package com.raywenderlich.listmaker
 
 import android.os.Bundle
+import android.text.InputType
 import com.google.android.material.snackbar.Snackbar
 import androidx.appcompat.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.Adapter
+import android.widget.EditText
+import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 
@@ -27,8 +31,10 @@ class MainActivity : AppCompatActivity() {
         todoListRecyclerView.adapter = TodoListAdapter()
 
         fab.setOnClickListener { view ->
-            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                    .setAction("Action", null).show()
+            // get the recycler view adapter from the RecyclerView (todoListRecyclerView)
+            // and cast as own TodoListAdapter
+            val adapter = todoListRecyclerView.adapter as TodoListAdapter
+            adapter.addNewItem()
         }
     }
 
