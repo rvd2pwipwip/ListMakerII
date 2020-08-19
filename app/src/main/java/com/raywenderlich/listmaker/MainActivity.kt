@@ -12,20 +12,25 @@ import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
-
+    //access recycler view
     private lateinit var todoListRecyclerView: RecyclerView
+    //access data manager with context
+    val listDataManager = ListDataManager(this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
 
+        //get lists from list data manager
+        val lists = listDataManager.readLists()
+
         //reference the lists_recyclerview from content_main.xml
         todoListRecyclerView = findViewById(R.id.lists_recyclerview)
         //tell recyclerView which layout to use for its items
         todoListRecyclerView.layoutManager = LinearLayoutManager(this)
-        //assign custom adapter to recyclerView
-        todoListRecyclerView.adapter = TodoListAdapter()
+        //assign adapter to recyclerView and pass in the lists from listDataManager
+        todoListRecyclerView.adapter = TodoListAdapter(lists)
 
         fab.setOnClickListener {
             showCreateTodoListDialog()
@@ -60,9 +65,12 @@ class MainActivity : AppCompatActivity() {
         myDialog.setPositiveButton(positiveButtonTitle) { dialog, _ ->
             // 1. access the adapter in the setPositiveButton closure
             val adapter = todoListRecyclerView.adapter as TodoListAdapter
-            // 2. call addNewItem and pass the EditText text value as a string
-            adapter.addNewItem(todoTitleEditText.text.toString())
-
+            // 2. create empty task list and pass editText value as title
+            val list = TaskList(todoTitleEditText.text.toString())
+            // 3. save the list
+            listDataManager.saveList(list)
+            //update recycler view with new list of task lists
+            adapter.addList(list)
             dialog.dismiss()
         }
         myDialog.create().show()
