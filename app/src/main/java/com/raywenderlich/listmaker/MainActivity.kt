@@ -1,5 +1,6 @@
 package com.raywenderlich.listmaker
 
+import android.content.Intent
 import android.os.Bundle
 import android.text.InputType
 import android.view.Menu
@@ -12,10 +13,14 @@ import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
+
+    companion object {
+        const val INTENT_LIST_KEY = "list"
+    }
     //access recycler view
     private lateinit var todoListRecyclerView: RecyclerView
     //access data manager with context
-    val listDataManager = ListDataManager(this)
+    private val listDataManager = ListDataManager(this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -74,5 +79,15 @@ class MainActivity : AppCompatActivity() {
             dialog.dismiss()
         }
         myDialog.create().show()
+    }
+
+    //open the DetailActivity with a passed list
+    private fun showTaskListItems(list: TaskList) {
+        //access the activity with an intent that passes the context and the activity class
+        val taskListItem = Intent(this, DetailActivity::class.java)
+        //add an extra that passes an intent list key
+        taskListItem.putExtra(INTENT_LIST_KEY, list) //must implement Parcel in TaskList
+        //start the activity
+        startActivity(taskListItem)
     }
 }
