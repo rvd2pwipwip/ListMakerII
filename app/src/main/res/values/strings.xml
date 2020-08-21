@@ -3,4 +3,7 @@
     <string name="action_settings">Settings</string>
     <string name="name_of_list_prompt">What is the name of your list?</string>
     <string name="create_list">Create</string>
+    <string name="task_name">Task name</string>
+    <string name="task_to_add">What is the task?</string>
+    <string name="add_task">Add</string>
 </resources>

@@ -16,6 +16,7 @@ class MainActivity : AppCompatActivity(), TodoListAdapter.TodoListClickListener 
 
     companion object {
         const val INTENT_LIST_KEY = "list"
+        const val LIST_DETAIL_REQUEST_CODE = 123
     }
     //access recycler view
     private lateinit var todoListRecyclerView: RecyclerView
@@ -58,6 +59,28 @@ class MainActivity : AppCompatActivity(), TodoListAdapter.TodoListClickListener 
         }
     }
 
+    //enable result reception
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        //if there is data...
+        if (requestCode == LIST_DETAIL_REQUEST_CODE) {
+            //...unpack it
+            data?.let {
+                val list = data.getParcelableExtra<TaskList>(INTENT_LIST_KEY)!!
+                listDataManager.saveList(list)
+                updateLists()
+            }
+        }
+
+    }
+
+    private fun updateLists() {
+        //get lists from listDataManager
+        val lists = listDataManager.readLists()
+        //create new adapter using lists to refresh recycler view
+        todoListRecyclerView.adapter = TodoListAdapter(lists, this)
+    }
+
     // create a standard dialog to ask user to name new todolist
     private fun showCreateTodoListDialog() {
         val dialogTitle = getString(R.string.name_of_list_prompt)
@@ -89,8 +112,8 @@ class MainActivity : AppCompatActivity(), TodoListAdapter.TodoListClickListener 
         val taskListItem = Intent(this, DetailActivity::class.java)
         //add an extra that passes an intent list key
         taskListItem.putExtra(INTENT_LIST_KEY, list) //must implement Parcel in TaskList
-        //start the activity
-        startActivity(taskListItem)
+        //launch activity with expected result
+        startActivityForResult(taskListItem, LIST_DETAIL_REQUEST_CODE)
     }
 
     //implement required member (listItemClicked) to be able to send the list to the new DetailActivity
