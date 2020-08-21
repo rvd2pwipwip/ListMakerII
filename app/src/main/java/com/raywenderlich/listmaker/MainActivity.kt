@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.activity_main.*
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), TodoListAdapter.TodoListClickListener {
 
     companion object {
         const val INTENT_LIST_KEY = "list"
@@ -35,7 +35,7 @@ class MainActivity : AppCompatActivity() {
         //tell recyclerView which layout to use for its items
         todoListRecyclerView.layoutManager = LinearLayoutManager(this)
         //assign adapter to recyclerView and pass in the lists from listDataManager
-        todoListRecyclerView.adapter = TodoListAdapter(lists)
+        todoListRecyclerView.adapter = TodoListAdapter(lists, this) //and pass the activity for the click listener
 
         fab.setOnClickListener {
             showCreateTodoListDialog()
@@ -77,6 +77,8 @@ class MainActivity : AppCompatActivity() {
             //update recycler view with new list of task lists
             adapter.addList(list)
             dialog.dismiss()
+            //show new list's detail activity screen
+            showTaskListItems(list)
         }
         myDialog.create().show()
     }
@@ -89,5 +91,10 @@ class MainActivity : AppCompatActivity() {
         taskListItem.putExtra(INTENT_LIST_KEY, list) //must implement Parcel in TaskList
         //start the activity
         startActivity(taskListItem)
+    }
+
+    //implement required member (listItemClicked) to be able to send the list to the new DetailActivity
+    override fun listItemClicked(list: TaskList) {
+        showTaskListItems(list)
     }
 }
