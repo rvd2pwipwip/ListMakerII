@@ -12,31 +12,19 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.activity_main.*
 
-class MainActivity : AppCompatActivity(), TodoListAdapter.TodoListClickListener {
+class MainActivity : AppCompatActivity(), TodoListFragment.OnFragmentInteractionListener {
+
+    private var todoListFragment = TodoListFragment.newInstance()
 
     companion object {
         const val INTENT_LIST_KEY = "list"
         const val LIST_DETAIL_REQUEST_CODE = 123
     }
-    //access recycler view
-    private lateinit var todoListRecyclerView: RecyclerView
-    //access data manager with context
-    private val listDataManager = ListDataManager(this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
-
-        //get lists from list data manager
-        val lists = listDataManager.readLists()
-
-        //reference the lists_recyclerview from content_main.xml
-        todoListRecyclerView = findViewById(R.id.lists_recyclerview)
-        //tell recyclerView which layout to use for its items
-        todoListRecyclerView.layoutManager = LinearLayoutManager(this)
-        //assign adapter to recyclerView and pass in the lists from listDataManager
-        todoListRecyclerView.adapter = TodoListAdapter(lists, this) //and pass the activity for the click listener
 
         fab.setOnClickListener {
             showCreateTodoListDialog()
@@ -67,18 +55,10 @@ class MainActivity : AppCompatActivity(), TodoListAdapter.TodoListClickListener 
             //...unpack it
             data?.let {
                 val list = data.getParcelableExtra<TaskList>(INTENT_LIST_KEY)!!
-                listDataManager.saveList(list)
-                updateLists()
+                todoListFragment.saveList(list)
             }
         }
 
-    }
-
-    private fun updateLists() {
-        //get lists from listDataManager
-        val lists = listDataManager.readLists()
-        //create new adapter using lists to refresh recycler view
-        todoListRecyclerView.adapter = TodoListAdapter(lists, this)
     }
 
     // create a standard dialog to ask user to name new todolist
@@ -91,14 +71,9 @@ class MainActivity : AppCompatActivity(), TodoListAdapter.TodoListClickListener 
         myDialog.setTitle(dialogTitle)
         myDialog.setView(todoTitleEditText)
         myDialog.setPositiveButton(positiveButtonTitle) { dialog, _ ->
-            // 1. access the adapter in the setPositiveButton closure
-            val adapter = todoListRecyclerView.adapter as TodoListAdapter
             // 2. create empty task list and pass editText value as title
             val list = TaskList(todoTitleEditText.text.toString())
-            // 3. save the list
-            listDataManager.saveList(list)
-            //update recycler view with new list of task lists
-            adapter.addList(list)
+            todoListFragment.addList(list)
             dialog.dismiss()
             //show new list's detail activity screen
             showTaskListItems(list)
@@ -116,8 +91,7 @@ class MainActivity : AppCompatActivity(), TodoListAdapter.TodoListClickListener 
         startActivityForResult(taskListItem, LIST_DETAIL_REQUEST_CODE)
     }
 
-    //implement required member (listItemClicked) to be able to send the list to the new DetailActivity
-    override fun listItemClicked(list: TaskList) {
+    override fun onTodoListClicked(list: TaskList) {
         showTaskListItems(list)
     }
 }
